@@ -1,0 +1,9 @@
+module FinHive.FeaturedApp where
+
+template FeaturedAppActivityMarker
+  with
+    provider : Party
+    activityRef : Text
+    amount : Decimal
+  where
+    signatory provider

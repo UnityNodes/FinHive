@@ -1,0 +1,31 @@
+services:
+  web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3100:3100"
+    env_file: ../.env
+    environment:
+      LEDGER_API_BASE: http://splice-validator-participant-1:7575
+    restart: unless-stopped
+    networks:
+      - default
+
+  agent:
+    build:
+      context: ../agent
+      dockerfile: Dockerfile
+    env_file: ../.env
+    environment:
+      LEDGER_API_BASE: http://splice-validator-participant-1:7575
+    restart: unless-stopped
+    depends_on:
+      - web
+    networks:
+      - default
+
+networks:
+  default:
+    name: splice-validator_splice_validator
+    external: true

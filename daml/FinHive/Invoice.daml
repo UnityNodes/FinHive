@@ -1,0 +1,94 @@
+module FinHive.Invoice where
+
+import FinHive.Types
+import FinHive.FeaturedApp
+
+template Invoice
+  with
+    operator : Party
+    vendor : Party
+    apClerk : Party
+    invoiceId : Text
+    lineItems : [LineItem]
+    totalAmount : Decimal
+    currency : Text
+    status : InvoiceStatus
+  where
+    signatory vendor, operator
+    observer apClerk
+
+    ensure totalAmount > 0.0
+
+    nonconsuming choice GetBudgetView : ContractId BudgetView
+      with
+        ceo : Party
+      controller apClerk
+      do
+        create BudgetView with
+          operator
+          apClerk
+          ceo
+          vendorName = partyToText vendor
+          totalAmount
+          currency
+          invoiceId
+
+    choice ApproveInvoice : (ContractId Settlement, ContractId FeaturedAppActivityMarker)
+      controller apClerk
+      do
+        assertMsg "not pending" (status == Pending)
+        marker <- create FeaturedAppActivityMarker with
+          provider = operator
+          activityRef = invoiceId
+          amount = totalAmount
+        settlement <- create Settlement with
+          operator
+          vendor
+          apClerk
+          invoiceId
+          totalAmount
+          currency
+          marker
+        pure (settlement, marker)
+
+    choice RejectInvoice : ()
+      controller apClerk
+      do pure ()
+
+template BudgetView
+  with
+    operator : Party
+    apClerk : Party
+    ceo : Party
+    vendorName : Text
+    totalAmount : Decimal
+    currency : Text
+    invoiceId : Text
+  where
+    signatory apClerk
+    observer ceo, operator
+
+template Settlement
+  with
+    operator : Party
+    vendor : Party
+    apClerk : Party
+    invoiceId : Text
+    totalAmount : Decimal
+    currency : Text
+    marker : ContractId FeaturedAppActivityMarker
+  where
+    signatory apClerk
+    observer vendor, operator
+
+template ProposedAction
+  with
+    operator : Party
+    apClerk : Party
+    agentParty : Party
+    invoiceId : Text
+    action : AgentAction
+    reasoning : Text
+  where
+    signatory agentParty
+    observer apClerk, operator

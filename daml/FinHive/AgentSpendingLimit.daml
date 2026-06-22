@@ -1,0 +1,25 @@
+module FinHive.AgentSpendingLimit where
+
+template AgentSpendingLimit
+  with
+    operator : Party
+    ceo : Party
+    agentParty : Party
+    dailyCapUSD : Decimal
+    spentTodayUSD : Decimal
+  where
+    signatory ceo
+    observer agentParty, operator
+
+    choice ConsumeBudget : ContractId AgentSpendingLimit
+      with
+        amount : Decimal
+      controller agentParty
+      do
+        assertMsg "exceeds daily cap" (spentTodayUSD + amount <= dailyCapUSD)
+        create this with spentTodayUSD = spentTodayUSD + amount
+
+    choice ResetDaily : ContractId AgentSpendingLimit
+      controller ceo
+      do
+        create this with spentTodayUSD = 0.0

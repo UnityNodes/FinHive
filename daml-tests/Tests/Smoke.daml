@@ -1,0 +1,52 @@
+module Tests.Smoke where
+
+import Daml.Script
+import DA.Assert
+import FinHive.Types
+import FinHive.Company
+import FinHive.Invoice
+
+smoke : Script ()
+smoke = do
+  operator <- allocateParty "operator"
+  ceo <- allocateParty "ceo"
+  ap <- allocateParty "ap"
+  vendor <- allocateParty "vendor"
+  agent <- allocateParty "agent"
+
+  _company <- submit operator do
+    createCmd Company with
+      operator
+      companyName = "Acme"
+      members = [ceo, ap, vendor, agent]
+
+  inv <- submit (actAs [vendor, operator]) do
+    createCmd Invoice with
+      operator
+      vendor
+      apClerk = ap
+      invoiceId = "INV-1"
+      lineItems = [LineItem "Widgets" 10 100.0]
+      totalAmount = 1000.0
+      currency = "USD"
+      status = Pending
+
+  _bv <- submit ap do
+    exerciseCmd inv GetBudgetView with ceo
+
+  ceoViews <- query @BudgetView ceo
+  length ceoViews === 1
+
+  ceoInvoices <- query @Invoice ceo
+  length ceoInvoices === 0
+
+  (_settlement, _marker) <- submit ap do
+    exerciseCmd inv ApproveInvoice
+
+  ceoSettlements <- query @Settlement ceo
+  length ceoSettlements === 0
+
+  vendorSettlements <- query @Settlement vendor
+  length vendorSettlements === 1
+
+  pure ()

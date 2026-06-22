@@ -1,0 +1,14 @@
+module FinHive.PaymentPolicy where
+
+template PaymentPolicy
+  with
+    operator : Party
+    ceo : Party
+    apClerk : Party
+    agentParty : Party
+    maxPerInvoice : Decimal
+    autoApproveBelow : Decimal
+    vendorAllowlist : [Party]
+  where
+    signatory ceo
+    observer apClerk, agentParty, operator

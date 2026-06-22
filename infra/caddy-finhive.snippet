@@ -1,0 +1,5 @@
+finhive.unitynodes.com {
+	bind YOUR_SERVER_IP
+	tls /etc/ssl/YOUR_ORIGIN_CERT.pem /etc/ssl/YOUR_ORIGIN_CERT-key.pem
+	reverse_proxy 127.0.0.1:3100
+}

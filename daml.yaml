@@ -1,0 +1,17 @@
+sdk-version: 3.4.11
+name: finhive
+source: daml
+version: 0.1.0
+build-options:
+  - --target=2.1
+dependencies:
+  - daml-prim
+  - daml-stdlib
+parties:
+  - operator
+  - alice_ceo
+  - bob_ap
+  - vera_vendor
+  - cara_customer
+  - hannah_hr
+  - agent

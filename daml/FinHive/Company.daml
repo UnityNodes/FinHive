@@ -1,0 +1,25 @@
+module FinHive.Company where
+
+import FinHive.Types
+import FinHive.Role
+
+template Company
+  with
+    operator : Party
+    companyName : Text
+    members : [Party]
+  where
+    signatory operator
+    observer members
+
+    nonconsuming choice AssignRole : ContractId Role
+      with
+        holder : Party
+        roleType : RoleType
+      controller operator
+      do
+        create Role with
+          operator
+          company = companyName
+          holder
+          roleType

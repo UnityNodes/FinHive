@@ -1,0 +1,13 @@
+module FinHive.Role where
+
+import FinHive.Types
+
+template Role
+  with
+    operator : Party
+    company : Text
+    holder : Party
+    roleType : RoleType
+  where
+    signatory operator
+    observer holder

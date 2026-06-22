@@ -1,0 +1,34 @@
+module FinHive.Types where
+
+data RoleType
+  = CEO
+  | AP_Clerk
+  | Vendor
+  | HR
+  | Employee
+  deriving (Eq, Show)
+
+data InvoiceStatus
+  = Pending
+  | Approved
+  | Settled
+  | Rejected
+  deriving (Eq, Show)
+
+data LineItem = LineItem
+  with
+    description : Text
+    quantity : Int
+    unitPrice : Decimal
+  deriving (Eq, Show)
+
+data Frequency
+  = Weekly
+  | Monthly
+  deriving (Eq, Show)
+
+data AgentAction
+  = AUTO_APPROVE
+  | FLAG_FOR_REVIEW
+  | REJECT
+  deriving (Eq, Show)

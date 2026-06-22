@@ -1,0 +1,30 @@
+module FinHive.RecurringPayment where
+
+import FinHive.Types
+import FinHive.FeaturedApp
+
+template RecurringPayment
+  with
+    operator : Party
+    customer : Party
+    vendor : Party
+    apClerk : Party
+    amount : Decimal
+    currency : Text
+    frequency : Frequency
+    nextCharge : Time
+  where
+    signatory customer, vendor, operator
+    observer apClerk
+
+    choice Charge : (ContractId RecurringPayment, ContractId FeaturedAppActivityMarker)
+      with
+        newNextCharge : Time
+      controller vendor
+      do
+        marker <- create FeaturedAppActivityMarker with
+          provider = operator
+          activityRef = "recurring:" <> partyToText customer
+          amount
+        next <- create this with nextCharge = newNextCharge
+        pure (next, marker)

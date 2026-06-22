@@ -1,0 +1,10 @@
+module Main where
+
+import FinHive.Types ()
+import FinHive.FeaturedApp ()
+import FinHive.Company ()
+import FinHive.Role ()
+import FinHive.Invoice ()
+import FinHive.PaymentPolicy ()
+import FinHive.AgentSpendingLimit ()
+import FinHive.RecurringPayment ()
